@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tài khoản của tôi | NOVA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#18211f; --muted:#60716c; --mint:#dff5e6; --lime:#b9f43d; --line:#dce4df; --paper:#f7faf8; --coral:#ff725e; --white:#fff; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:"DM Sans",sans-serif; }
+    .wrap { width:min(1100px, calc(100% - 40px)); margin:auto; }
+    nav { height:76px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); }
+    .logo { display:flex; align-items:center; gap:8px; color:var(--ink); text-decoration:none; font:700 23px "Space Grotesk"; letter-spacing:1px; }
+    .logo-mark { width:18px; height:18px; background:var(--lime); border-radius:50% 50% 50% 3px; transform:rotate(45deg); }
+    .back { color:#286b50; text-decoration:none; font-weight:700; font-size:14px; }
+    .hero { padding:70px 0 35px; display:flex; justify-content:space-between; align-items:end; gap:30px; }
+    .eyebrow { color:#32705a; text-transform:uppercase; letter-spacing:1.2px; font-size:12px; font-weight:700; }
+    h1, h2, h3 { font-family:"Space Grotesk"; }
+    h1 { font-size:clamp(42px, 6vw, 72px); line-height:.95; margin:14px 0 0; }
+    .hero p { max-width:390px; color:var(--muted); line-height:1.6; }
+    .account-grid { display:grid; grid-template-columns:.72fr 1.28fr; gap:18px; padding-bottom:80px; }
+    .card { border:1px solid var(--line); background:var(--white); padding:26px; }
+    .profile-card { background:var(--ink); color:#fff; }
+    .profile-icon { width:60px; height:60px; display:grid; place-items:center; margin-bottom:25px; border-radius:50%; background:var(--lime); color:var(--ink); font:700 25px "Space Grotesk"; }
+    .profile-card h2 { margin:0 0 8px; font-size:27px; }
+    .profile-card p { color:#bed1c7; line-height:1.6; }
+    .profile-line { padding:14px 0; border-top:1px solid #3b4e47; font-size:13px; }
+    .profile-line span { display:block; margin-top:4px; color:#bed1c7; }
+    .logout { width:100%; margin-top:22px; padding:12px; border:1px solid #60766b; background:transparent; color:#fff; font-weight:700; cursor:pointer; }
+    .section-head { display:flex; justify-content:space-between; align-items:center; gap:15px; margin-bottom:17px; }
+    .section-head h2 { margin:0; font-size:25px; }
+    .order { padding:16px 0; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr auto; gap:8px 20px; }
+    .order strong { font-size:15px; }
+    .order small { color:var(--muted); }
+    .order-price { font-weight:700; text-align:right; }
+    .status { grid-column:2; color:#286b50; font-size:12px; font-weight:700; }
+    .empty, .loading { color:var(--muted); font-size:14px; padding:18px 0; }
+    .shop-button { display:inline-block; margin-top:10px; padding:12px 16px; background:var(--coral); color:#fff; text-decoration:none; font-weight:700; }
+    @media (max-width:760px) { .wrap { width:min(100% - 30px, 600px); } nav { height:66px; }.hero { display:block; padding-top:48px; }.hero p { margin-top:20px; }.account-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap"><nav><a class="logo" href="index.html"><span class="logo-mark"></span>NOVA</a><a class="back" href="index.html">Về cửa hàng</a></nav></div>
+  <main class="wrap">
+    <section class="hero"><div><div class="eyebrow">NOVA Care / tài khoản</div><h1>Không gian<br>của bạn.</h1></div><p>Quản lý thông tin cá nhân và theo dõi những đơn đặt trước của bạn trong một nơi gọn gàng.</p></section>
+    <section class="account-grid"><aside class="card profile-card"><div class="profile-icon" id="profile-icon">N</div><h2 id="profile-name">Đang tải...</h2><p>Khách hàng NOVA</p><div class="profile-line">Email<span id="profile-email">Đang tải...</span></div><div class="profile-line">Số điện thoại<span id="profile-phone">Đang tải...</span></div><button class="logout" id="logout">Đăng xuất</button></aside><section class="card"><div class="section-head"><h2>Đơn đặt trước</h2><span class="eyebrow" id="order-count">0 đơn</span></div><div id="orders"><p class="loading">Đang tải đơn hàng...</p></div><a class="shop-button" href="index.html#dat-hang">Tiếp tục mua sắm</a></section></section>
+  </main>
+  <script>
+    const apiBase = window.location.protocol === 'file:' ? 'http://127.0.0.1:4173' : '';
+    const account = JSON.parse(localStorage.getItem('novaAccount') || 'null');
+    const loggedIn = localStorage.getItem('novaLoggedIn') === 'true' && account;
+    if (!loggedIn) window.location.replace('login.html');
+    else {
+      document.querySelector('#profile-name').textContent = account.name;
+      document.querySelector('#profile-email').textContent = account.email;
+      document.querySelector('#profile-phone').textContent = account.phone || 'Chưa cập nhật';
+      document.querySelector('#profile-icon').textContent = account.name.trim().charAt(0).toUpperCase();
+      document.querySelector('#logout').addEventListener('click', () => { localStorage.removeItem('novaLoggedIn'); window.location.href = 'index.html'; });
+      const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+      const money = value => new Intl.NumberFormat('vi-VN').format(value) + 'đ';
+      if (!account.id) { document.querySelector('#orders').innerHTML = '<p class="empty">Phiên đăng nhập cũ cần được xác thực lại để tải đúng dữ liệu tài khoản.</p><a class="shop-button" href="login.html">Đăng nhập lại</a>'; } else { fetch(`${apiBase}/api/customers/${encodeURIComponent(account.id)}/orders?account_view=1`).then(response => { if (!response.ok) throw new Error('Không thể tải dữ liệu tài khoản.'); return response.json(); }).then(orders => { document.querySelector('#order-count').textContent = `${orders.length} đơn`; document.querySelector('#orders').innerHTML = orders.length ? orders.map(order => `<article class="order"><strong>${escapeHtml(order.product_name)}</strong><span class="order-price">${money(order.total_amount)}</span><small>Ngày đặt: ${new Date(order.created_at).toLocaleDateString('vi-VN')} · Số lượng: ${order.quantity}</small><span class="status">${escapeHtml(order.status)}</span></article>`).join('') : '<p class="empty">Bạn chưa có đơn đặt trước nào.</p>'; }).catch(() => { document.querySelector('#orders').innerHTML = '<p class="empty">Bạn chưa có đơn đặt trước nào.</p>'; }); }
+    }
+  </script>
+</body>
+</html>

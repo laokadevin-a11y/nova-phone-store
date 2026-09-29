@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng nhập | NOVA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="support-widget.css">
+  <script src="support-widget.js" defer></script>
+  <style>
+    :root { --ink:#18211f; --muted:#60716c; --lime:#b9f43d; --line:#dce4df; --paper:#f7faf8; --coral:#ff725e; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; color:var(--ink); background:linear-gradient(135deg, #e4f3e9 0 46%, var(--paper) 46%); font-family:"DM Sans", Arial, sans-serif; }
+    .page { width:min(460px, calc(100% - 32px)); }
+    .logo { display:flex; align-items:center; justify-content:center; gap:8px; color:var(--ink); text-decoration:none; font:700 23px "Space Grotesk"; letter-spacing:1px; margin-bottom:24px; }
+    .logo-mark { width:18px; height:18px; background:var(--lime); border-radius:50% 50% 50% 3px; transform:rotate(45deg); }
+    .panel { background:#fff; border:1px solid var(--line); padding:32px; box-shadow:0 18px 45px rgba(28,51,41,.08); }
+    .eyebrow { color:#32705a; font-size:13px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; }
+    h1 { margin:13px 0 8px; font:700 40px/1 "Space Grotesk"; }
+    .intro { margin:0 0 25px; color:var(--muted); font-size:14px; }
+    .field { margin-bottom:16px; }
+    label { display:block; margin-bottom:7px; font-size:13px; font-weight:700; }
+    input { width:100%; padding:13px 12px; border:1px solid var(--line); border-radius:3px; outline-color:#398363; color:var(--ink); font:inherit; }
+    .submit { width:100%; border:0; border-radius:3px; padding:15px; background:var(--coral); color:#fff; font-weight:700; cursor:pointer; }
+    .result { min-height:18px; margin:12px 0 0; color:#b64c3e; font-size:13px; }
+    .links { display:flex; justify-content:space-between; gap:15px; margin-top:22px; font-size:13px; }
+    .links a { color:#32705a; font-weight:700; text-decoration:none; }
+    @media (max-width:500px) { .panel { padding:24px; } h1 { font-size:34px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <a class="logo" href="index.html"><span class="logo-mark"></span>NOVA</a>
+    <section class="panel">
+      <div class="eyebrow">NOVA Care</div>
+      <h1>Đăng nhập</h1>
+      <p class="intro">Đăng nhập để mở khóa chức năng mua sản phẩm.</p>
+      <form id="login-form">
+        <div class="field"><label for="email">Email</label><input id="email" type="email" required autocomplete="email" placeholder="email@example.com"></div>
+        <div class="field"><label for="password">Mật khẩu</label><input id="password" type="password" required autocomplete="current-password" placeholder="Mật khẩu của bạn"></div>
+        <button class="submit" type="submit">Đăng nhập</button>
+        <p class="result" id="result"></p>
+      </form>
+      <div class="links"><a id="register-link" href="register.html">Đăng ký tài khoản</a><a href="index.html">Xem sản phẩm</a></div>
+    </section>
+  </main>
+  <script>
+    lucide.createIcons();
+    const apiBase = window.location.protocol === 'file:' ? 'http://127.0.0.1:4173' : '';
+    const loginParams = new URLSearchParams(window.location.search);
+    if (loginParams.get('purchase') === '1') document.querySelector('#register-link').href = 'register.html?purchase=1';
+    document.querySelector('#login-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const email = document.querySelector('#email').value.trim().toLowerCase();
+      const password = document.querySelector('#password').value;
+      const result = document.querySelector('#result');
+      let account;
+      try { const endpoint = email === 'admin@gmail.com' ? '/api/admin/login' : '/api/login'; const response = await fetch(`${apiBase}${endpoint}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(email === 'admin@gmail.com' ? { username:email, password } : { email, password }) }); const payload = await response.json(); if (!response.ok) { result.textContent = payload.error || 'Email hoặc mật khẩu chưa đúng.'; return; } if (email === 'admin@gmail.com') { window.location.href = 'admin.html'; return; } account = { id: payload.id, name: payload.name, phone: payload.phone, email: payload.email }; } catch (error) { result.textContent = 'Chưa kết nối được máy chủ. Hãy chạy start.ps1 trước khi đăng nhập.'; return; }
+      if (account.role === 'admin') { window.location.href = 'admin.html'; return; }
+      localStorage.setItem('novaAccount', JSON.stringify(account));
+      localStorage.setItem('novaLoggedIn', 'true');
+      window.location.href = new URLSearchParams(window.location.search).get('purchase') === '1' ? 'index.html?purchase=1' : 'index.html';
+    });
+  </script>
+</body>
+</html>
